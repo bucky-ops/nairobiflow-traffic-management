@@ -1,0 +1,233 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Thika Superhighway (A2)",
+                "type": "highway",
+                "lanes": 8,
+                "speed_limit": "110 km/h",
+                "description": "Main north-south artery"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        36.8236,
+                        -1.2833
+                    ],
+                    [
+                        36.8521,
+                        -1.2512
+                    ],
+                    [
+                        36.9025,
+                        -1.2316
+                    ],
+                    [
+                        36.9528,
+                        -1.2123
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Mombasa Road (A109)",
+                "type": "highway",
+                "lanes": 6,
+                "speed_limit": "100 km/h",
+                "description": "Main east-west artery to Mombasa"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        36.8236,
+                        -1.2833
+                    ],
+                    [
+                        36.8562,
+                        -1.2956
+                    ],
+                    [
+                        36.9278,
+                        -1.3192
+                    ],
+                    [
+                        36.9821,
+                        -1.3425
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Waiyaki Way (A104)",
+                "type": "highway",
+                "lanes": 6,
+                "speed_limit": "80 km/h",
+                "description": "Western bypass"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        36.8236,
+                        -1.2833
+                    ],
+                    [
+                        36.7856,
+                        -1.2789
+                    ],
+                    [
+                        36.7523,
+                        -1.2745
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Langata Road",
+                "type": "arterial",
+                "lanes": 4,
+                "speed_limit": "60 km/h",
+                "description": "Southern arterial road"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        36.8236,
+                        -1.2833
+                    ],
+                    [
+                        36.7956,
+                        -1.3123
+                    ],
+                    [
+                        36.7656,
+                        -1.3345
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Ngong Road",
+                "type": "arterial",
+                "lanes": 4,
+                "speed_limit": "60 km/h",
+                "description": "Southwestern arterial road"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        36.8236,
+                        -1.2833
+                    ],
+                    [
+                        36.7956,
+                        -1.2956
+                    ],
+                    [
+                        36.7656,
+                        -1.3123
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Jogoo Road",
+                "type": "arterial",
+                "lanes": 4,
+                "speed_limit": "60 km/h",
+                "description": "Eastern arterial road"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        36.8236,
+                        -1.2833
+                    ],
+                    [
+                        36.8562,
+                        -1.2789
+                    ],
+                    [
+                        36.8856,
+                        -1.2745
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Uhuru Highway",
+                "type": "arterial",
+                "lanes": 6,
+                "speed_limit": "70 km/h",
+                "description": "Central city highway"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        36.7956,
+                        -1.2833
+                    ],
+                    [
+                        36.8236,
+                        -1.2833
+                    ],
+                    [
+                        36.8521,
+                        -1.2833
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Outer Ring Road",
+                "type": "bypass",
+                "lanes": 4,
+                "speed_limit": "80 km/h",
+                "description": "Eastern bypass"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        36.8236,
+                        -1.2456
+                    ],
+                    [
+                        36.8562,
+                        -1.2456
+                    ],
+                    [
+                        36.8856,
+                        -1.2456
+                    ],
+                    [
+                        36.9156,
+                        -1.2456
+                    ]
+                ]
+            }
+        }
+    ]
+}

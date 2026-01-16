@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nairobi Traffic Analysis System</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header .status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #2d2d2d;
+            padding: 1.5rem;
+            overflow-y: auto;
+            border-right: 1px solid #404040;
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .control-section {
+            margin-bottom: 2rem;
+        }
+
+        .control-section h3 {
+            color: #a78bfa;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .layer-control {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .layer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem;
+            background: #404040;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .layer-item:hover {
+            background: #4a4a4a;
+            transform: translateX(5px);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #555;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+
+        .info-panel {
+            background: #404040;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-panel h4 {
+            color: #a78bfa;
+            margin-bottom: 0.5rem;
+        }
+
+        .traffic-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: #333;
+            padding: 0.8rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4ade80;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 0.2rem;
+        }
+
+        .incident-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .incident-item {
+            background: #333;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #ef4444;
+        }
+
+        .incident-severity {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .severity-high { background: #ef4444; }
+        .severity-medium { background: #f59e0b; }
+        .severity-low { background: #10b981; }
+
+        .route-planner {
+            background: #404040;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .route-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: white;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .route-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #333;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(45, 45, 45, 0.9);
+            padding: 1rem;
+            border-radius: 8px;
+            z-index: 1000;
+        }
+
+        .legend h4 {
+            margin-bottom: 0.5rem;
+            color: #a78bfa;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .traffic-low { background: #10b981; }
+        .traffic-medium { background: #f59e0b; }
+        .traffic-high { background: #ef4444; }
+        .traffic-severe { background: #7c2d12; }
+
+        /* Warning System Styles */
+        .warning-dashboard {
+            background: #404040;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .alert-status {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+            background: #333;
+            border-radius: 6px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.active {
+            opacity: 1;
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .status-indicator.critical.active {
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+        }
+
+        .status-indicator.high.active {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+
+        .status-icon {
+            font-size: 1rem;
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-count {
+            background: #667eea;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .alert-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .alert-item {
+            background: #333;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #667eea;
+            animation: slideInAlert 0.3s ease;
+        }
+
+        .alert-item.alert-critical {
+            border-left-color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .alert-item.alert-high {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .alert-item.alert-medium {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .alert-item.alert-low {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+
+        .alert-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .alert-level {
+            font-size: 0.7rem;
+            padding: 2px 4px;
+            border-radius: 3px;
+            background: #667eea;
+            color: white;
+        }
+
+        .alert-message {
+            font-size: 0.8rem;
+            color: #ccc;
+            margin-bottom: 0.3rem;
+        }
+
+        .alert-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #999;
+        }
+
+        .warning-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .warning-btn {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            background: #555;
+        }
+
+        .warning-btn:hover {
+            background: #666;
+        }
+
+        .warning-btn.muted {
+            background: #ef4444;
+        }
+
+        /* Traffic Visualization Styles */
+        .traffic-line {
+            transition: all 0.3s ease;
+        }
+
+        .traffic-arrow {
+            animation: moveArrow 2s linear infinite;
+        }
+
+        .speed-indicator {
+            animation: pulseSpeed 2s ease-in-out infinite;
+        }
+
+        .traffic-particle {
+            animation: particleFade 1s ease-out;
+        }
+
+        .heatmap-circle {
+            transition: all 0.5s ease;
+        }
+
+        .density-gradient {
+            transition: all 0.3s ease;
+        }
+
+        /* Warning Notification Styles */
+        .warning-notification {
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .warning-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .warning-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+
+        .warning-message {
+            font-size: 0.9rem;
+        }
+
+        .warning-location {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        /* Critical Alert Overlay */
+        .critical-alert-overlay {
+            animation: fadeInCritical 0.3s ease;
+        }
+
+        .critical-alert-box {
+            background: #1a1a1a;
+            border: 2px solid #dc2626;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            text-align: center;
+            animation: slideInCritical 0.5s ease;
+        }
+
+        .critical-alert-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        .critical-icon {
+            font-size: 2rem;
+            animation: pulseCritical 1s infinite;
+        }
+
+        .critical-alert-content h3 {
+            color: #ef4444;
+            margin-bottom: 1rem;
+        }
+
+        .critical-alert-content p {
+            color: #ccc;
+            margin-bottom: 0.5rem;
+        }
+
+        .critical-alert-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .critical-btn {
+            background: #dc2626;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .critical-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Animations */
+        @keyframes slideInAlert {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInWarning {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutWarning {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInCritical {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInCritical {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulseCritical {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes moveArrow {
+            0% {
+                transform: translateX(-5px);
+            }
+            50% {
+                transform: translateX(5px);
+            }
+            100% {
+                transform: translateX(-5px);
+            }
+        }
+
+        @keyframes pulseSpeed {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes particleFade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>
+            🇰🇪 Nairobi Traffic Analysis System
+        </h1>
+        <div class="status">
+            <div class="status-indicator"></div>
+            <span>Live Data Connected</span>
+            <span id="last-update">Last update: --:--:--</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="control-section">
+                <h3>🗺️ Map Layers</h3>
+                <div class="layer-control">
+                    <div class="layer-item">
+                        <span>Live Traffic</span>
+                        <div class="toggle-switch active" id="traffic-toggle"></div>
+                    </div>
+                    <div class="layer-item">
+                        <span>Traffic Flow Animation</span>
+                        <div class="toggle-switch active" id="flow-animation-toggle"></div>
+                    </div>
+                    <div class="layer-item">
+                        <span>Traffic Heatmap</span>
+                        <div class="toggle-switch" id="heatmap-toggle"></div>
+                    </div>
+                    <div class="layer-item">
+                        <span>Road Network</span>
+                        <div class="toggle-switch active" id="roads-toggle"></div>
+                    </div>
+                    <div class="layer-item">
+                        <span>Landmarks</span>
+                        <div class="toggle-switch" id="landmarks-toggle"></div>
+                    </div>
+                    <div class="layer-item">
+                        <span>Traffic Incidents</span>
+                        <div class="toggle-switch active" id="incidents-toggle"></div>
+                    </div>
+                    <div class="layer-item">
+                        <span>Traffic Hotspots</span>
+                        <div class="toggle-switch" id="hotspots-toggle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>📊 Traffic Statistics</h3>
+                <div class="info-panel">
+                    <div class="traffic-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="avg-speed">--</div>
+                            <div class="stat-label">Avg Speed (km/h)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="incidents-count">0</div>
+                            <div class="stat-label">Active Incidents</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="congestion-level">--</div>
+                            <div class="stat-label">Congestion Level</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="data-age">--</div>
+                            <div class="stat-label">Data Age (min)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>⚠️ Recent Incidents</h3>
+                <div class="incident-list" id="incident-list">
+                    <div class="incident-item">
+                        <div>Loading incidents...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>🛣️ Route Planner</h3>
+                <div class="route-planner">
+                    <input type="text" class="route-input" id="start-point" placeholder="Starting point or click on map">
+                    <input type="text" class="route-input" id="end-point" placeholder="Destination or click on map">
+                    <button class="btn" id="plan-route">Calculate Route</button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="loading-overlay" id="loading">
+                <div class="spinner"></div>
+            </div>
+            <div class="legend">
+                <h4>Traffic Flow</h4>
+                <div class="legend-item">
+                    <div class="legend-color traffic-low"></div>
+                    <span>Low Traffic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color traffic-medium"></div>
+                    <span>Medium Traffic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color traffic-high"></div>
+                    <span>High Traffic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color traffic-severe"></div>
+                    <span>Severe Traffic</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/warningSystem.js"></script>
+    <script src="js/trafficVisualizer.js"></script>
+    <script src="js/predictiveWarningSystem.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            window.trafficMap = new NairobiTrafficMap();
+            window.trafficManager = new TrafficManager();
+            window.uiManager = new UIManager();
+            window.warningSystem = new WarningSystem();
+            
+            // Initialize traffic visualizer after map is ready
+            setTimeout(() => {
+                window.trafficVisualizer = new TrafficVisualizer(window.trafficMap.map);
+                window.predictiveWarningSystem = new PredictiveWarningSystem();
+            }, 1000);
+            
+            window.uiManager.addCustomControls();
+        });
+    </script>
+</body>
+</html>

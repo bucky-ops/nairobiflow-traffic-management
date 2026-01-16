@@ -1,0 +1,69 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "CBD Area",
+                "congestion_level": "high",
+                "peak_hours": "07:00-09:00, 17:00-19:00",
+                "description": "Central business district"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.8236,
+                    -1.2833
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Thika Road - Githurai",
+                "congestion_level": "severe",
+                "peak_hours": "06:30-10:00, 16:30-20:00",
+                "description": "Major intersection"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.9256,
+                    -1.2234
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Mombasa Road - Nyayo Stadium",
+                "congestion_level": "high",
+                "peak_hours": "07:00-09:30, 17:30-19:30",
+                "description": "Stadium traffic area"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.8456,
+                    -1.2956
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Waiyaki Way - Westlands",
+                "congestion_level": "medium",
+                "peak_hours": "07:30-09:00, 17:00-19:00",
+                "description": "Westlands commercial area"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.7856,
+                    -1.2789
+                ]
+            }
+        }
+    ]
+}

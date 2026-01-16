@@ -1,0 +1,36 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nairobi Metropolitan Area",
+        "population": "10+ million",
+        "area": "696 km²",
+        "country": "Kenya",
+        "region": "East Africa"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [36.6786, -1.4449],
+          [37.0990, -1.4449],
+          [37.0990, -1.1629],
+          [36.6786, -1.1629],
+          [36.6786, -1.4449]
+        ]]
+      }
+    }
+  ],
+  "bounds": {
+    "southwest": { "lat": -1.4449, "lng": 36.6786 },
+    "northeast": { "lat": -1.1629, "lng": 37.0990 }
+  },
+  "center": { "lat": -1.2921, "lng": 36.8219 },
+  "defaultZoom": 11,
+  "metadata": {
+    "lastUpdated": "2025-01-16T00:00:00Z",
+    "source": "OpenStreetMap",
+    "accuracy": "high"
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Jomo Kenyatta International Airport",
+        "type": "airport",
+        "description": "Main international airport serving Nairobi",
+        "importance": "high",
+        "capacity": "7.5 million passengers annually",
+        "code": "JKIA",
+        "runways": 2
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.9278, -1.3192]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nairobi National Park",
+        "type": "park",
+        "description": "Wildlife reserve near city center",
+        "importance": "high",
+        "area": "117 km²",
+        "established": "1946",
+        "visitors": "150,000 annually"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.8546, -1.3621]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kenyatta International Convention Centre",
+        "type": "landmark",
+        "description": "Iconic 28-story building and conference venue",
+        "importance": "high",
+        "height": "105 meters",
+        "floors": 28,
+        "built": "1974"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.8236, -1.2833]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nairobi Railway Station",
+        "type": "transport",
+        "description": "Main railway station for passenger services",
+        "importance": "medium",
+        "lines": ["Uganda Railway", "SGR"],
+        "dailyPassengers": "25,000"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.8285, -1.2836]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Thika Road Mall",
+        "type": "shopping",
+        "description": "Major shopping complex along Thika Superhighway",
+        "importance": "medium",
+        "size": "50,000 m²",
+        "stores": 120,
+        "parking": "1,500 spaces"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.9025, -1.2316]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Two Rivers Mall",
+        "type": "shopping",
+        "description": "Largest shopping mall in East Africa",
+        "importance": "high",
+        "size": "65,000 m²",
+        "stores": 200,
+        "parking": "2,000 spaces"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.8830, -1.2029]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Karen Blixen Museum",
+        "type": "museum",
+        "description": "Historical museum dedicated to Danish author",
+        "importance": "medium",
+        "built": "1912",
+        "visitors": "50,000 annually"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.7336, -1.3177]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Giraffe Centre",
+        "type": "attraction",
+        "description": "Wildlife conservation center for Rothschild giraffes",
+        "importance": "medium",
+        "area": "120 acres",
+        "giraffes": 12,
+        "visitors": "100,000 annually"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.7392, -1.3292]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Uhuru Park",
+        "type": "park",
+        "description": "Central recreational park in Nairobi CBD",
+        "importance": "medium",
+        "area": "12.9 hectares",
+        "lake": "artificial lake",
+        "visitors": "daily crowds"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.8219, -1.2921]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nairobi National Museum",
+        "type": "museum",
+        "description": "National museum showcasing Kenyan heritage",
+        "importance": "high",
+        "established": "1929",
+        "exhibits": "cultural and natural history"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.8171, -1.2756]
+      }
+    }
+  ],
+  "metadata": {
+    "totalLandmarks": 10,
+    "lastUpdated": "2025-01-16T00:00:00Z",
+    "source": "Kenya Tourism Board",
+    "accuracy": "high"
+  }
+}

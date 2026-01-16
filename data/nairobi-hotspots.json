@@ -1,0 +1,164 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "CBD Area",
+        "congestionLevel": "high",
+        "peakHours": "07:00-09:00, 17:00-19:00",
+        "description": "Central business district",
+        "importance": "critical",
+        "areaSize": "5 km²",
+        "averageDelay": "15-25 minutes",
+        "frequentIncidents": true,
+        "alternativeRoutes": ["Waiyaki Way", "Thika Road", "Mombasa Road"]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.8236, -1.2833]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Thika Road - Githurai",
+        "congestionLevel": "severe",
+        "peakHours": "06:30-10:00, 16:30-20:00",
+        "description": "Major intersection and commercial center",
+        "importance": "critical",
+        "areaSize": "3 km²",
+        "averageDelay": "25-40 minutes",
+        "frequentIncidents": true,
+        "bottleneckType": "intersection",
+        "alternativeRoutes": ["Outering Road", "Eastern Bypass"]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.9256, -1.2234]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mombasa Road - Nyayo Stadium",
+        "congestionLevel": "high",
+        "peakHours": "07:00-09:30, 17:30-19:30",
+        "description": "Stadium traffic and airport access",
+        "importance": "major",
+        "areaSize": "2 km²",
+        "averageDelay": "15-20 minutes",
+        "frequentIncidents": false,
+        "eventTraffic": true,
+        "alternativeRoutes": ["Southern Bypass", "Langata Road"]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.8456, -1.2956]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Waiyaki Way - Westlands",
+        "congestionLevel": "medium",
+        "peakHours": "07:30-09:00, 17:00-19:00",
+        "description": "Westlands commercial area",
+        "importance": "major",
+        "areaSize": "4 km²",
+        "averageDelay": "10-15 minutes",
+        "frequentIncidents": false,
+        "commercialActivity": "high",
+        "alternativeRoutes": ["Uhuru Highway", "Northern Bypass"]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.7856, -1.2789]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "JKIA Access Road",
+        "congestionLevel": "high",
+        "peakHours": "05:00-08:00, 16:00-20:00",
+        "description": "Airport access and drop-off area",
+        "importance": "critical",
+        "areaSize": "1.5 km²",
+        "averageDelay": "20-30 minutes",
+        "frequentIncidents": false,
+        "airportTraffic": true,
+        "alternativeRoutes": ["Southern Bypass", "Mombasa Road"]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.9278, -1.3192]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ngong Road - Junction",
+        "congestionLevel": "medium",
+        "peakHours": "07:45-09:15, 17:30-19:15",
+        "description": "Ngong Road and Karen Junction",
+        "importance": "major",
+        "areaSize": "2 km²",
+        "averageDelay": "8-12 minutes",
+        "frequentIncidents": false,
+        "shoppingTraffic": true,
+        "alternativeRoutes": ["Langata Road", "Southern Bypass"]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.7656, -1.3123]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Thika Road - Garden Estate",
+        "congestionLevel": "high",
+        "peakHours": "07:00-09:30, 16:30-19:30",
+        "description": "Residential access and school traffic",
+        "importance": "major",
+        "areaSize": "2.5 km²",
+        "averageDelay": "12-18 minutes",
+        "frequentIncidents": false,
+        "residentialTraffic": true,
+        "alternativeRoutes": ["Outering Road", "Thika Road Service Lane"]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.9528, -1.2123]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Outering Road - Donholm",
+        "congestionLevel": "medium",
+        "peakHours": "07:15-09:00, 17:15-19:00",
+        "description": "Eastern bypass and residential access",
+        "importance": "major",
+        "areaSize": "3 km²",
+        "averageDelay": "10-15 minutes",
+        "frequentIncidents": false,
+        "bypassTraffic": true,
+        "alternativeRoutes": ["Jogoo Road", "Eastern Bypass Extension"]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.9156, -1.2698]
+      }
+    }
+  ],
+  "metadata": {
+    "totalHotspots": 8,
+    "lastUpdated": "2025-01-16T00:00:00Z",
+    "source": "Nairobi County Transport Department",
+    "accuracy": "high",
+    "updateFrequency": "quarterly",
+    "criteria": "traffic volume, incident frequency, average delay"
+  }
+}

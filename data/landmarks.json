@@ -1,0 +1,125 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Nairobi National Park",
+                "type": "park",
+                "description": "Wildlife reserve near city center"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.8546,
+                    -1.3621
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Jomo Kenyatta International Airport",
+                "type": "airport",
+                "description": "Main international airport"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.9278,
+                    -1.3192
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Kenyatta International Convention Centre",
+                "type": "landmark",
+                "description": "Iconic city landmark"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.8236,
+                    -1.2833
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Nairobi Railway Station",
+                "type": "transport",
+                "description": "Main railway station"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.8285,
+                    -1.2836
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Thika Road Mall",
+                "type": "shopping",
+                "description": "Major shopping complex"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.9025,
+                    -1.2316
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Two Rivers Mall",
+                "type": "shopping",
+                "description": "Largest shopping mall in East Africa"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.8830,
+                    -1.2029
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Karen Blixen Museum",
+                "type": "museum",
+                "description": "Historical museum"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.7336,
+                    -1.3177
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Giraffe Centre",
+                "type": "attraction",
+                "description": "Wildlife conservation center"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    36.7392,
+                    -1.3292
+                ]
+            }
+        }
+    ]
+}
