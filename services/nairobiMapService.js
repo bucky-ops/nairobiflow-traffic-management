@@ -1,11 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const boundaries = require('../data/boundaries.json');
-const landmarks = require('../data/landmarks.json');
-const roads = require('../data/roads.json');
-const hotspots = require('../data/hotspots.json');
-const suburbs = require('../data/suburbs.json');
+const boundaries = require('../data/nairobi-boundaries.json');
+const landmarks = require('../data/nairobi-landmarks.json');
+const roads = require('../data/nairobi-roads.json');
+const hotspots = require('../data/nairobi-hotspots.json');
+const suburbs = require('../data/nairobi-suburbs.json');
 
 class NairobiMapService {
   constructor() {
