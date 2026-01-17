@@ -1,0 +1,31 @@
+# Development Dockerfile
+FROM node:18-alpine AS base
+
+# Install dependencies for development
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy package files
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN npm ci
+
+# Development stage
+FROM base AS dev
+WORKDIR /app
+
+# Install development dependencies
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Create logs directory
+RUN mkdir -p logs && chown -R node:node logs
+
+# Expose ports
+EXPOSE 3000 9229
+
+# Switch to non-root user
+USER node
+
+# Start development server
+CMD ["npm", "run", "dev"]

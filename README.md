@@ -1,6 +1,11 @@
-# Nairobi Metropolitan Traffic Analysis System
+# NairobiFlow - 🚦 Intelligent Traffic Management System
 
-A comprehensive real-time traffic mapping and analysis system for Nairobi metropolitan area, Kenya.
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=flat-square&logo=docker)](https://www.docker.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+
+A comprehensive, production-ready intelligent traffic management system designed specifically for Nairobi metropolitan area. Combines real-time traffic monitoring, predictive analytics, advanced warning systems, and interactive visualization.
 
 ## 🌍 Features
 
@@ -52,11 +57,38 @@ A comprehensive real-time traffic mapping and analysis system for Nairobi metrop
 - Data age monitoring
 - Traffic pattern predictions
 
-## 🚀 Quick Start
+## 🚀 Quick Start with Docker
 
-### **Prerequisites**
-- Node.js 14+ 
-- API keys for traffic data (see configuration)
+### 🐳 One-Command Setup
+```bash
+# Clone the repository
+git clone https://github.com/bucky-ops/nairobiflow-traffic-management.git
+cd nairobiflow-traffic-management
+
+# Quick start (interactive)
+chmod +x quick-start.sh
+./quick-start.sh
+```
+
+### 🛠️ Manual Setup
+```bash
+# Setup environment
+cp .env.docker .env
+# Edit .env with your API keys
+
+# Development
+docker-compose -f docker-compose.dev.yml up -d --build
+
+# Production
+docker-compose up -d --build
+```
+
+### 🌐 Access Services
+- **Application:** http://localhost:3000
+- **Database:** localhost:5432 (production) / 5433 (development)
+- **Redis:** localhost:6379 (production) / 6380 (development)
+- **PgAdmin:** http://localhost:5050 (dev with admin)
+- **Monitoring:** http://localhost:9090 (Prometheus) / 3001 (Grafana)
 
 ### **Installation**
 ```bash
