@@ -4,6 +4,10 @@ const { v4: uuidv4 } = require('uuid');
 const database = require('../config/database');
 const { logger, performanceLogger, businessLogger } = require('../utils/logger');
 
+/**
+ * Service for handling traffic data retrieval, storage, and analytics.
+ * Integrates with TomTom API and manages local caching and database storage.
+ */
 class TrafficDataService {
   constructor() {
     this.cache = new NodeCache({ stdTTL: process.env.CACHE_TTL || 300 });
@@ -16,11 +20,18 @@ class TrafficDataService {
     this.TrafficIncident = database.getModel('TrafficIncident');
   }
 
+  /**
+   * Retrieves live traffic data for a specific bounding box.
+   * Checks cache first, then fetches from TomTom API if needed.
+   * 
+   * @param {string} [bounds] - Comma-separated string of coordinates (minLat,minLon,maxLat,maxLon). Defaults to Nairobi bounds.
+   * @returns {Promise<Object>} The live traffic data object.
+   */
   async getLiveTrafficData(bounds = null) {
     const start = Date.now();
     const cacheKey = `live-traffic-${bounds || 'nairobi'}`;
     const cached = this.cache.get(cacheKey);
-    
+
     if (cached) {
       performanceLogger.logCacheOperation('get', cacheKey, true, Date.now() - start);
       return cached;
@@ -29,27 +40,33 @@ class TrafficDataService {
     try {
       const nairobiBounds = bounds || this.getNairobiBounds();
       const trafficData = await this.fetchTomTomTraffic(nairobiBounds);
-      
+
       // Store in cache
       this.cache.set(cacheKey, trafficData);
-      
+
       // Log performance
       const duration = Date.now() - start;
       performanceLogger.logExternalApiCall('tomtom', 'traffic', duration, true);
-      
+
       // Store in database for analytics
       await this.storeTrafficData(trafficData);
-      
+
       return trafficData;
     } catch (error) {
       const duration = Date.now() - start;
       performanceLogger.logExternalApiCall('tomtom', 'traffic', duration, false);
       logger.error('Error fetching live traffic data', { error: error.message, bounds });
-      
+
       return this.getFallbackTrafficData();
     }
   }
 
+  /**
+   * Stores fetched traffic segments into the database for historical analytics.
+   * 
+   * @param {Object} trafficData - The traffic data object containing segments.
+   * @returns {Promise<void>}
+   */
   async storeTrafficData(trafficData) {
     try {
       if (!trafficData.segments || !Array.isArray(trafficData.segments)) {
@@ -77,29 +94,35 @@ class TrafficDataService {
       }));
 
       // Bulk insert for performance
-      await this.TrafficData.bulkCreate(records, { 
+      await this.TrafficData.bulkCreate(records, {
         ignoreDuplicates: true,
-        validate: false 
+        validate: false
       });
 
-      logger.debug('Traffic data stored', { 
+      logger.debug('Traffic data stored', {
         recordCount: records.length,
         source: 'tomtom'
       });
 
     } catch (error) {
-      logger.error('Error storing traffic data', { 
+      logger.error('Error storing traffic data', {
         error: error.message,
         segmentCount: trafficData.segments?.length
       });
     }
   }
 
+  /**
+   * Retrieves current traffic incidents.
+   * Checks cache, then database, then external API.
+   * 
+   * @returns {Promise<Array>} Array of incident objects.
+   */
   async getTrafficIncidents() {
     const start = Date.now();
     const cacheKey = 'traffic-incidents';
     const cached = this.cache.get(cacheKey);
-    
+
     if (cached) {
       performanceLogger.logCacheOperation('get', cacheKey, true, Date.now() - start);
       return cached;
@@ -120,22 +143,22 @@ class TrafficDataService {
 
       // Fetch from external API if no database records
       const incidents = await this.fetchTomTomIncidents();
-      
+
       // Store in database
       await this.storeIncidentData(incidents);
-      
+
       // Cache the results
       this.cache.set(cacheKey, incidents);
-      
+
       const duration = Date.now() - start;
       performanceLogger.logExternalApiCall('tomtom', 'incidents', duration, true);
-      
+
       return incidents;
     } catch (error) {
       const duration = Date.now() - start;
       performanceLogger.logExternalApiCall('tomtom', 'incidents', duration, false);
       logger.error('Error fetching traffic incidents', { error: error.message });
-      
+
       // Return database incidents as fallback
       try {
         const fallbackIncidents = await this.TrafficIncident.findActive({
@@ -175,18 +198,18 @@ class TrafficDataService {
         started_at: incident.startTime ? new Date(incident.startTime) : new Date()
       }));
 
-      await this.TrafficIncident.bulkCreate(records, { 
+      await this.TrafficIncident.bulkCreate(records, {
         ignoreDuplicates: true,
-        validate: false 
+        validate: false
       });
 
-      logger.debug('Incident data stored', { 
+      logger.debug('Incident data stored', {
         recordCount: records.length,
         source: 'tomtom'
       });
 
     } catch (error) {
-      logger.error('Error storing incident data', { 
+      logger.error('Error storing incident data', {
         error: error.message,
         incidentCount: incidents.length
       });
@@ -214,21 +237,38 @@ class TrafficDataService {
     return severityMap[severity] || 'medium';
   }
 
-  async getRouteInfo(start, end, alternatives = false) {
+  /**
+   * Calculates a route between two points considering current traffic.
+   * 
+   * @param {string} start - Start coordinates (lat,lng).
+   * @param {string} end - End coordinates (lat,lng).
+   * @param {boolean} [alternatives=false] - Whether to include alternative routes.
+   * @param {Object} [options={}] - Additional routing options.
+   * @returns {Promise<Object>} Route calculation data.
+   */
+  async getRouteInfo(start, end, alternatives = false, options = {}) {
+    const startTimer = Date.now();
     const cacheKey = `route-${start}-${end}-${alternatives}`;
     const cached = this.cache.get(cacheKey);
-    
+
     if (cached) {
+      performanceLogger.logCacheOperation('get', cacheKey, true, Date.now() - startTimer);
       return cached;
     }
 
     try {
       const routeData = await this.fetchTomTomRoute(start, end, alternatives);
       this.cache.set(cacheKey, routeData);
+
+      const duration = Date.now() - startTimer;
+      performanceLogger.logExternalApiCall('tomtom', 'route', duration, true);
+
       return routeData;
     } catch (error) {
-      console.error('Error calculating route:', error);
-      return null;
+      const duration = Date.now() - startTimer;
+      performanceLogger.logExternalApiCall('tomtom', 'route', duration, false);
+      logger.error('Error calculating route', { error: error.message, start, end });
+      throw error;
     }
   }
 
@@ -239,7 +279,7 @@ class TrafficDataService {
 
     const [minLat, minLon, maxLat, maxLon] = bounds.split(',');
     const url = `https://api.tomtom.com/traffic/services/4/flowSegmentAbsolute/relative/json/10/${minLat},${minLon}/${maxLat},${maxLon}`;
-    
+
     const response = await axios.get(url, {
       params: {
         key: this.apiKeys.tomtom,
@@ -258,9 +298,9 @@ class TrafficDataService {
 
     const nairobiBounds = this.getNairobiBounds();
     const [minLat, minLon, maxLat, maxLon] = nairobiBounds.split(',');
-    
+
     const url = `https://api.tomtom.com/traffic/services/5/incidentDetails/json`;
-    
+
     const response = await axios.get(url, {
       params: {
         key: this.apiKeys.tomtom,
@@ -278,7 +318,7 @@ class TrafficDataService {
     }
 
     const url = `https://api.tomtom.com/routing/1/calculateRoute/${start}:${end}/json`;
-    
+
     const response = await axios.get(url, {
       params: {
         key: this.apiKeys.tomtom,
@@ -335,6 +375,12 @@ class TrafficDataService {
   }
 
   // New methods for production functionality
+  /**
+   * Records user-reported traffic data.
+   * 
+   * @param {Object} data - Traffic data payload.
+   * @returns {Promise<Object>} The created traffic record.
+   */
   async recordTrafficData(data) {
     try {
       const record = await this.TrafficData.create({
@@ -353,7 +399,7 @@ class TrafficDataService {
       });
 
       businessLogger.logTrafficData(record);
-      
+
       return record.toJSON();
     } catch (error) {
       logger.error('Error recording traffic data', { error: error.message, data });
@@ -361,6 +407,13 @@ class TrafficDataService {
     }
   }
 
+  /**
+   * key
+   * Reports a new traffic incident.
+   * 
+   * @param {Object} data - Incident report payload.
+   * @returns {Promise<Object>} The created incident record.
+   */
   async reportIncident(data) {
     try {
       const incident = await this.TrafficIncident.create({
@@ -382,7 +435,7 @@ class TrafficDataService {
       });
 
       businessLogger.logTrafficIncident(incident);
-      
+
       return incident.toJSON();
     } catch (error) {
       logger.error('Error reporting incident', { error: error.message, data });
@@ -390,6 +443,18 @@ class TrafficDataService {
     }
   }
 
+  /**
+   * Retrieves historical traffic analytics based on criteria.
+   * 
+   * @param {Object} options - Query options.
+   * @param {string} [options.startDate] - ISO date string for start of range.
+   * @param {string} [options.endDate] - ISO date string for end of range.
+   * @param {string} [options.location] - Filter by specific location name.
+   * @param {string} [options.granularity='hour'] - Time grouping (hour, day, week).
+   * @param {number} [options.limit=100] - Max results to return.
+   * @param {number} [options.offset=0] - Pagination offset.
+   * @returns {Promise<Array>} Array of analytics data points.
+   */
   async getTrafficAnalytics(options = {}) {
     try {
       const {
@@ -402,13 +467,13 @@ class TrafficDataService {
       } = options;
 
       const whereClause = {};
-      
+
       if (startDate && endDate) {
         whereClause.recorded_at = {
           [database.getSequelize().Sequelize.Op.between]: [startDate, endDate]
         };
       }
-      
+
       if (location) {
         whereClause.location = location;
       }
@@ -437,7 +502,7 @@ class TrafficDataService {
   async subscribeToWarnings(subscriptionData) {
     try {
       const WarningSubscription = database.getModel('WarningSubscription');
-      
+
       const subscription = await WarningSubscription.create({
         id: uuidv4(),
         api_key_id: subscriptionData.apiKeyId,
@@ -455,7 +520,7 @@ class TrafficDataService {
         notification_frequency: subscriptionData.notificationFrequency || 'immediate'
       });
 
-      logger.info('Warning subscription created', { 
+      logger.info('Warning subscription created', {
         subscriptionId: subscription.id,
         location: subscriptionData.location
       });
@@ -467,28 +532,12 @@ class TrafficDataService {
     }
   }
 
-  async getRouteInfo(start, end, alternatives = false, options = {}) {
-    const start = Date.now();
-    
-    try {
-      const routeData = await this.fetchTomTomRoute(start, end, alternatives);
-      
-      const duration = Date.now() - start;
-      performanceLogger.logExternalApiCall('tomtom', 'route', duration, true);
-      
-      return routeData;
-    } catch (error) {
-      const duration = Date.now() - start;
-      performanceLogger.logExternalApiCall('tomtom', 'route', duration, false);
-      logger.error('Error calculating route', { error: error.message, start, end });
-      throw error;
-    }
-  }
+
 
   isHealthy() {
     const hasApiKeys = !!(this.apiKeys.tomtom || this.apiKeys.google);
     const isDbConnected = database.isConnected;
-    
+
     return hasApiKeys && isDbConnected;
   }
 
@@ -496,7 +545,7 @@ class TrafficDataService {
     try {
       const dbHealth = await database.healthCheck();
       const cacheStats = this.cache.getStats();
-      
+
       return {
         status: this.isHealthy() ? 'healthy' : 'unhealthy',
         database: dbHealth,
