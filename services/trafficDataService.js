@@ -4,6 +4,10 @@ const { v4: uuidv4 } = require('uuid');
 const database = require('../config/database');
 const { logger, performanceLogger, businessLogger } = require('../utils/logger');
 
+/**
+ * Service for handling traffic data retrieval, storage, and analytics.
+ * Integrates with TomTom API and manages local caching and database storage.
+ */
 class TrafficDataService {
   constructor() {
     this.cache = new NodeCache({ stdTTL: process.env.CACHE_TTL || 300 });
@@ -16,6 +20,13 @@ class TrafficDataService {
     this.TrafficIncident = database.getModel('TrafficIncident');
   }
 
+  /**
+   * Retrieves live traffic data for a specific bounding box.
+   * Checks cache first, then fetches from TomTom API if needed.
+   * 
+   * @param {string} [bounds] - Comma-separated string of coordinates (minLat,minLon,maxLat,maxLon). Defaults to Nairobi bounds.
+   * @returns {Promise<Object>} The live traffic data object.
+   */
   async getLiveTrafficData(bounds = null) {
     const start = Date.now();
     const cacheKey = `live-traffic-${bounds || 'nairobi'}`;
@@ -50,6 +61,12 @@ class TrafficDataService {
     }
   }
 
+  /**
+   * Stores fetched traffic segments into the database for historical analytics.
+   * 
+   * @param {Object} trafficData - The traffic data object containing segments.
+   * @returns {Promise<void>}
+   */
   async storeTrafficData(trafficData) {
     try {
       if (!trafficData.segments || !Array.isArray(trafficData.segments)) {
@@ -95,6 +112,12 @@ class TrafficDataService {
     }
   }
 
+  /**
+   * Retrieves current traffic incidents.
+   * Checks cache, then database, then external API.
+   * 
+   * @returns {Promise<Array>} Array of incident objects.
+   */
   async getTrafficIncidents() {
     const start = Date.now();
     const cacheKey = 'traffic-incidents';
@@ -214,6 +237,15 @@ class TrafficDataService {
     return severityMap[severity] || 'medium';
   }
 
+  /**
+   * Calculates a route between two points considering current traffic.
+   * 
+   * @param {string} start - Start coordinates (lat,lng).
+   * @param {string} end - End coordinates (lat,lng).
+   * @param {boolean} [alternatives=false] - Whether to include alternative routes.
+   * @param {Object} [options={}] - Additional routing options.
+   * @returns {Promise<Object>} Route calculation data.
+   */
   async getRouteInfo(start, end, alternatives = false, options = {}) {
     const startTimer = Date.now();
     const cacheKey = `route-${start}-${end}-${alternatives}`;
@@ -343,6 +375,12 @@ class TrafficDataService {
   }
 
   // New methods for production functionality
+  /**
+   * Records user-reported traffic data.
+   * 
+   * @param {Object} data - Traffic data payload.
+   * @returns {Promise<Object>} The created traffic record.
+   */
   async recordTrafficData(data) {
     try {
       const record = await this.TrafficData.create({
@@ -369,6 +407,13 @@ class TrafficDataService {
     }
   }
 
+  /**
+   * key
+   * Reports a new traffic incident.
+   * 
+   * @param {Object} data - Incident report payload.
+   * @returns {Promise<Object>} The created incident record.
+   */
   async reportIncident(data) {
     try {
       const incident = await this.TrafficIncident.create({
@@ -398,6 +443,18 @@ class TrafficDataService {
     }
   }
 
+  /**
+   * Retrieves historical traffic analytics based on criteria.
+   * 
+   * @param {Object} options - Query options.
+   * @param {string} [options.startDate] - ISO date string for start of range.
+   * @param {string} [options.endDate] - ISO date string for end of range.
+   * @param {string} [options.location] - Filter by specific location name.
+   * @param {string} [options.granularity='hour'] - Time grouping (hour, day, week).
+   * @param {number} [options.limit=100] - Max results to return.
+   * @param {number} [options.offset=0] - Pagination offset.
+   * @returns {Promise<Array>} Array of analytics data points.
+   */
   async getTrafficAnalytics(options = {}) {
     try {
       const {

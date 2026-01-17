@@ -77,7 +77,7 @@ const sequelize = new Sequelize(
     pool: dbConfig.pool,
     ssl: dbConfig.ssl,
     dialectOptions: dbConfig.dialectOptions,
-    
+
     // Global options
     define: {
       underscored: true,
@@ -114,7 +114,14 @@ const defineAssociations = () => {
 };
 
 // Database connection class
+/**
+ * Database abstraction layer using Sequelize.
+ * Manages connections, synchronization, and model access.
+ */
 class Database {
+  /**
+   * Initializes the database instance with Sequelize models.
+   */
   constructor() {
     this.sequelize = sequelize;
     this.models = {
@@ -127,17 +134,22 @@ class Database {
     this.isConnected = false;
   }
 
+  /**
+   * Establishes authentication with the database.
+   * @returns {Promise<boolean>} True if connection is successful.
+   * @throws {Error} If connection fails.
+   */
   async connect() {
     try {
       await this.sequelize.authenticate();
       this.isConnected = true;
-      
+
       logger.info('Database connection established successfully', {
         host: dbConfig.host,
         database: dbConfig.database,
         dialect: dbConfig.dialect
       });
-      
+
       return true;
     } catch (error) {
       this.isConnected = false;
@@ -146,50 +158,59 @@ class Database {
         host: dbConfig.host,
         database: dbConfig.database
       });
-      
+
       throw error;
     }
   }
 
+  /**
+   * Closes the database connection.
+   * @returns {Promise<boolean>} True if disconnected successfully.
+   */
   async disconnect() {
     try {
       await this.sequelize.close();
       this.isConnected = false;
-      
+
       logger.info('Database connection closed');
-      
+
       return true;
     } catch (error) {
       logger.error('Error closing database connection', {
         error: error.message
       });
-      
+
       throw error;
     }
   }
 
+  /**
+   * Synchronizes models with the database schema.
+   * @param {Object} [options={}] - Sequelize sync options (force, alter).
+   * @returns {Promise<boolean>} True if sync is successful.
+   */
   async sync(options = {}) {
     try {
       const defaultOptions = {
         force: false,
         alter: env === 'development'
       };
-      
+
       const syncOptions = { ...defaultOptions, ...options };
-      
+
       await this.sequelize.sync(syncOptions);
-      
+
       logger.info('Database synchronized successfully', {
         force: syncOptions.force,
         alter: syncOptions.alter
       });
-      
+
       return true;
     } catch (error) {
       logger.error('Database synchronization failed', {
         error: error.message
       });
-      
+
       throw error;
     }
   }
@@ -198,25 +219,29 @@ class Database {
     try {
       // Run migrations if needed
       await this.sync({ alter: true });
-      
+
       logger.info('Database migration completed');
-      
+
       return true;
     } catch (error) {
       logger.error('Database migration failed', {
         error: error.message
       });
-      
+
       throw error;
     }
   }
 
+  /**
+   * performs a health check on the database connection.
+   * @returns {Promise<Object>} Health status object with timing.
+   */
   async healthCheck() {
     try {
       const start = Date.now();
       await this.sequelize.authenticate();
       const duration = Date.now() - start;
-      
+
       return {
         status: 'healthy',
         connected: this.isConnected,
@@ -238,7 +263,7 @@ class Database {
 
   async transaction(callback) {
     const t = await this.sequelize.transaction();
-    
+
     try {
       const result = await callback(t);
       await t.commit();
@@ -250,34 +275,45 @@ class Database {
   }
 
   // Query helper with logging
+  /**
+   * Executes a raw SQL query with performance logging.
+   * @param {string} sql - The SQL statement.
+   * @param {Object} [options={}] - Sequelize query options.
+   * @returns {Promise<Array>} Query results.
+   */
   async query(sql, options = {}) {
     const start = Date.now();
-    
+
     try {
       const result = await this.sequelize.query(sql, options);
       const duration = Date.now() - start;
-      
+
       logger.debug('Database query executed', {
         sql: sql.substring(0, 100),
         duration: `${duration}ms`,
         rowCount: result[1]?.rowCount || 0
       });
-      
+
       return result;
     } catch (error) {
       const duration = Date.now() - start;
-      
+
       logger.error('Database query failed', {
         sql: sql.substring(0, 100),
         duration: `${duration}ms`,
         error: error.message
       });
-      
+
       throw error;
     }
   }
 
   // Get model by name
+  /**
+   * Retrieves a Sequelize model by name.
+   * @param {string} modelName - The name of the model to retrieve.
+   * @returns {Object|undefined} The Sequelize model class.
+   */
   getModel(modelName) {
     return this.models[modelName];
   }
